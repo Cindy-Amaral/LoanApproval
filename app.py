@@ -3,14 +3,29 @@ import plotly.express as px
 import pandas as pd
 import pickle
 import dash_bootstrap_components as dbc
+from sklearn.naive_bayes import GaussianNB
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 colors = {
-    'background': '#111111',
-    'text': '#7FDBFF'
+    'background': '#171b26',
+    'text': '#F2F2F2'
 }
+
+data = df = pd.read_csv('loan_data_1.csv', index_col=0)
+fig = px.histogram(data, x='ApplicantIncome', histfunc='count', template='ggplot2')
+fig.update_layout(plot_bgcolor=colors['background'])
+fig.update_layout(paper_bgcolor=colors['background'])
+fig.update_layout(
+    xaxis=dict(
+        tickfont=dict(color=colors['text'])
+    ),
+    yaxis=dict(
+        tickfont=dict(color=colors['text'])  
+    )
+)
 
 with open('feature_encoder.pkl', 'rb') as file:
     feature_encoder = pickle.load(file)
@@ -36,11 +51,11 @@ credit_options = {1: 'Yes',
 area_options = {'Rural':'Rural', 'Urban':'Urban', 'Semiurban':'Semiurban'}
 
 app.layout = html.Div(children=[
-    html.H1(children='Loan Approval Dashboard'),
-    html.Div(children='Select the options below to determine if you would be approved for a home loan.', style={'margin-bottom':'10px'}),
+    html.H1(children='Loan Approval Dashboard', style={'margin':'25px'}),
+    html.Div(children='Select the options below to determine if you would be approved for a home loan.', style={'margin-bottom':'10px', 'margin-left':'50px'}),
 
-    html.Div(className='row', children=[
-        html.Div(className='col-7', children=[
+    html.Div(className='row', style={'margin-left':'38px'}, children=[
+        html.Div(className='col-5', children=[
             html.Div(className='row', children=[
                 html.Div(className='col-2', children=[
                     html.H6("Select Gender:", style={'fontSize':14})
@@ -142,13 +157,16 @@ app.layout = html.Div(children=[
                 options= area_options
             ),
 
-            html.Button('Submit', id='submit_button'),
-            html.Div(id='placeholder_for_output')
+            html.Button('Submit', id='submit_button', style={'margin-bottom':'10px', 'margin-top':'10px'})
         ]),
 
-        html.Div(className='col-5', children=[
-                """test paragraph"""
+        html.Div(className='col-3', children=[
+                """Approval Status:""",
+                html.Div(id='placeholder_for_output')
         ])
+    ]),
+    html.Div(children=[
+        dcc.Graph(figure=fig)
     ])
 ], style = {'backgroundColor': colors['background'], 'color':colors['text'], 'margin':'0', 'padding':'0'})
 
