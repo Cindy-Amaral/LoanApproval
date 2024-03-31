@@ -6,15 +6,18 @@ import dash_bootstrap_components as dbc
 from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+
+app.css.append_css({'external_url': '/assets/reset.css'})
 
 colors = {
     'background': '#171b26',
     'text': '#F2F2F2'
 }
 
-data = df = pd.read_csv('loan_data_1.csv', index_col=0)
+data = pd.read_csv('loan_data_1.csv', index_col=0)
+data['ApplicantIncome'] = data['ApplicantIncome']*100
 fig = px.histogram(data, x='ApplicantIncome', histfunc='count', template='ggplot2')
 fig.update_layout(plot_bgcolor=colors['background'])
 fig.update_layout(paper_bgcolor=colors['background'])
@@ -157,7 +160,7 @@ app.layout = html.Div(children=[
                 options= area_options
             ),
 
-            html.Button('Submit', id='submit_button', style={'margin-bottom':'10px', 'margin-top':'10px'})
+            dbc.Button('Submit', id='submit_button', color='primary', style={'margin-bottom':'10px', 'margin-top':'10px'})
         ]),
 
         html.Div(className='col-3', children=[
